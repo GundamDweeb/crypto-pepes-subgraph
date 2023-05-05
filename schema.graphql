@@ -1,0 +1,108 @@
+type Global @entity{
+  id: ID!
+  totalSupply: Int!
+}
+
+type User @entity{
+  id: ID! #account
+  username: String
+  holdings: [Pepe!] @derivedFrom(field: "owner")
+}
+type Pepe @entity{
+  id: ID!
+  owner: User!
+  mother: Pepe!
+  father: Pepe!
+  named: Boolean!
+  name: String!
+  uri: String
+  previousOwner: User!
+  tokenId: BigInt!
+  metadata: PepeMetadata
+  blockNumber: BigInt!
+  mintedAt: BigInt!
+  isWrapped: Wrapped!
+  removed: BigInt #blocknumber
+}
+enum Wrapped{
+    Wrapped
+    UnWrapped
+}
+type PepeMetadata @entity {
+  id: ID! # IPFS URI
+  image: String
+  externalURL: String
+  name: String!
+  description: String!
+  attributes: [Attribute!] @derivedFrom(field: "metadata")
+}
+
+type Attribute @entity {
+  id: ID! # PepeMetadataID-TraitIndex
+  traitType: String!
+  value: String!
+  metadata: PepeMetadata!
+}
+
+interface Transaction {
+  id: ID!
+  pepe: Pepe! # address
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+type Mint implements Transaction  @entity(immutable: true) {
+  id: ID! #txHash - LogIndex
+  receiver: User!
+  sender: User!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  pepe: Pepe!
+}
+
+type Burn implements Transaction  @entity(immutable: true) {
+  id: ID! #txHash
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  sender: User!
+  pepe: Pepe!
+}
+type Transfer  implements Transaction  @entity(immutable: true)  {
+  id: ID! #txHash - LogIndex
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  receiver: User!
+  sender: User!
+  pepe: Pepe!
+}
+type Wrap  implements Transaction  @entity(immutable: true){
+  id: ID! #txHash - LogIndex
+  sender: User! # address
+  pepe: Pepe!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+type Unwrap  implements Transaction  @entity(immutable: true){
+  id: ID! #txHash - LogIndex
+  sender: User! # address
+  receiver: User! # address
+  pepe: Pepe!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+type PepeNamed  implements Transaction  @entity(immutable: true){
+  id: ID! #txHash - LogIndex
+  sender: User! # address
+  pepe: Pepe!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  name: String!
+}
+
+type BatchWrap  @entity{
+  id: ID! #txHash
+  sender: User! # address
+  pepes: [Pepe!]!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}

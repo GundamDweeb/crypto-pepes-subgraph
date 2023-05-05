@@ -1,0 +1,22 @@
+{
+  "name": "cryptopepe",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "prepare-mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "prepare-goerli": "mustache config/goerli.json subgraph.template.yaml > subgraph.yaml",
+    "deploy-goerli": "graph deploy --product hosted-service gundamdweeb/crypto-pepe-goerli",
+    "deploy-mainnet": "graph deploy --product hosted-service gundamdweeb/crypto-pepe-mainnet",
+    "create-local": "graph create --node http://localhost:8020/ cryptopepe",
+    "remove-local": "graph remove --node http://localhost:8020/ cryptopepe",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 cryptopepe",
+    "test": "graph test"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.48.0",
+    "@graphprotocol/graph-ts": "0.29.1",
+    "mustache": "4.2.0"
+  },
+  "devDependencies": { "matchstick-as": "0.5.0" }
+}
