@@ -1,6 +1,7 @@
 import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 import {
   BatchWrap as BatchWrapEvent,
+  BatchUnwrap as BatchUnwrap,
   Transfer as TransferEvent,
   Unwrap as UnwrapEvent,
   Wrap as WrapEvent,
@@ -21,7 +22,8 @@ import {
   burnPepe,
   setTokenuri,
   changeWrapState,
-  getGlobal
+  getGlobal,
+  createBatchUnwrap
 } from "./helpers"
 
 
@@ -132,6 +134,26 @@ export function handleUnwrap(event: UnwrapEvent): void {
   updatePepeOwner(event.params.tokenId, receiver.id, event.block.number);
   changeWrapState(event.params.tokenId,false);
 }
+
+export function handleBatchUnwrap(event: BatchUnwrap): void {
+  let sender = getOrCreateUser(event.params.sender)
+  let receiver = getOrCreateUser(event.params.receiver)
+  createBatchUnwrap(
+    event.transaction.hash,
+    event.logIndex,
+    event.params.tokenIds,
+    sender.id,
+    receiver.id,
+    event.block.number,
+    event.block.timestamp,
+  );
+  let tokenIDs = event.params.tokenIds;
+  for (var i = 0; i < tokenIDs.length; i ++) {
+    changeWrapState(tokenIDs[i],false);
+    updatePepeOwner(tokenIDs[i], receiver.id, event.block.number);
+  }
+  
+} 
 export function handleBatchMetadataUpdate(
   event: BatchMetadataUpdateEvent
 ): void {

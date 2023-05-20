@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: PepeBase
-    network:  goerli
+    network:  mainnet
     source:
-      address: '0x74021902C88CB3a5bcC8aA68E7CfC416D8175dA5'
+      address: '0x84aC94F17622241f313511B629e5E98f489AD6E4'
       abi: PepeBase
-      startBlock: 8894602
+      startBlock: 6481925
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -33,11 +33,11 @@ dataSources:
       file: ./src/mappings/pepe-base.ts
   - kind: ethereum
     name: CryptoPepeWrapper
-    network: goerli
+    network: mainnet
     source:
-      address: '0x661526219293E2853302e11Da6717476aD2c7ffa'
+      address: '0x0000000000000000000000000000000000000000'
       abi: CryptoPepeWrapper
-      startBlock: 8894603
+      startBlock: 6481925
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -52,13 +52,14 @@ dataSources:
         - UnWrap
         - BatchWrap
         - Transfer
-
       abis:
         - name: CryptoPepeWrapper
           file: ./abis/CryptoPepeWrapper.json
       eventHandlers:
         - event: BatchWrap(indexed address,uint256[])
           handler: handleBatchWrap
+        - event: BatchUnwrap(indexed address,indexed address,uint256[])
+          handler: handleBatchUnwrap
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
           receipt: true
@@ -69,7 +70,6 @@ dataSources:
         - event: BatchMetadataUpdate(uint256,uint256)
           handler: handleBatchMetadataUpdate
       file: ./src/mappings/crypto-pepe-wrapper.ts
-  
 templates:
   - name: PepeMetadata
     kind: file/ipfs

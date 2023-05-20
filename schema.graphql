@@ -50,6 +50,14 @@ interface Transaction {
   blockNumber: BigInt!
   timestamp: BigInt!
 }
+
+interface BatchTransaction {
+  id: ID!
+  pepes: [Pepe!]! # address
+  sender: User!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
 type Mint implements Transaction  @entity(immutable: true) {
   id: ID! #txHash - LogIndex
   receiver: User!
@@ -99,9 +107,19 @@ type PepeNamed  implements Transaction  @entity(immutable: true){
   name: String!
 }
 
-type BatchWrap  @entity{
+type BatchWrap implements BatchTransaction  @entity(immutable: true) {
   id: ID! #txHash
   sender: User! # address
+  receiver: User! # address
+  pepes: [Pepe!]!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+type BatchUnwrap  implements BatchTransaction  @entity(immutable: true){
+  id: ID! #txHash
+  sender: User! # address
+  receiver: User! # address
   pepes: [Pepe!]!
   blockNumber: BigInt!
   timestamp: BigInt!

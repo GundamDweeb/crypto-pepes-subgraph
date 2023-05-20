@@ -5,7 +5,7 @@ import {
     CryptoPepeWrapper as WrapperContract
   } from "../../generated/CryptoPepeWrapper/CryptoPepeWrapper"
 import {
-    User,Pepe,PepeMetadata, Wrap, Unwrap, BatchWrap, Transfer,Mint,Burn, Global, PepeNamed
+    User,Pepe,PepeMetadata, Wrap, Unwrap, BatchWrap, Transfer,Mint,Burn, Global, PepeNamed, BatchUnwrap
   } from '../../generated/schema';
 import { ADDRESS_ZERO,ADDRESS_WRAP } from './constants';
 import { PepeMetadata as PepeMetadataTemplate } from "../../generated/templates";
@@ -100,7 +100,7 @@ export function burnPepe(tokenID: BigInt, blockNumber: BigInt) : void {
         pepe.save();
     }
 }
-export function changeWrapState(tokenID: BigInt,isWrap: bool) : void{
+export function changeWrapState(tokenID: BigInt,isWrap: boolean) : void{
     let pepe = getPepe(tokenID)
     if(pepe != null) {
         if(isWrap == true){
@@ -140,6 +140,20 @@ export function createBatchWrap(txHash: Bytes,logIndex: BigInt, tokenIDs: BigInt
         batchWrap.pepes =pepeArray;
     }
     batchWrap.timestamp = timestamp;
+    batchWrap.receiver = senderID;
+    batchWrap.blockNumber = blockNumber;
+    batchWrap.save();
+}
+export function createBatchUnwrap(txHash: Bytes,logIndex: BigInt, tokenIDs: BigInt[], senderID: string,receiverID: string, blockNumber: BigInt, timestamp: BigInt) : void {
+    let batchWrap = new BatchUnwrap(txHash.toHexString().concat("-").concat(logIndex.toHexString()));
+    batchWrap.sender = senderID;
+    let pepeArray : Array<string> = [];
+    for (var i = 0; i < tokenIDs.length; i ++) {
+        pepeArray.push(tokenIDs[i].toHexString());
+        batchWrap.pepes =pepeArray;
+    }
+    batchWrap.timestamp = timestamp;
+    batchWrap.receiver = receiverID;
     batchWrap.blockNumber = blockNumber;
     batchWrap.save();
 }

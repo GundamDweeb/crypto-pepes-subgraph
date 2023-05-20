@@ -52,13 +52,14 @@ dataSources:
         - UnWrap
         - BatchWrap
         - Transfer
-
       abis:
         - name: CryptoPepeWrapper
           file: ./abis/CryptoPepeWrapper.json
       eventHandlers:
         - event: BatchWrap(indexed address,uint256[])
           handler: handleBatchWrap
+        - event: BatchUnwrap(indexed address,indexed address,uint256[])
+          handler: handleBatchUnwrap
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
           receipt: true
@@ -69,7 +70,6 @@ dataSources:
         - event: BatchMetadataUpdate(uint256,uint256)
           handler: handleBatchMetadataUpdate
       file: ./src/mappings/crypto-pepe-wrapper.ts
-  
 templates:
   - name: PepeMetadata
     kind: file/ipfs
