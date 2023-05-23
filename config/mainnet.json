@@ -1,7 +1,9 @@
 {
-  "cryptoPepeWrapper": "0x0000000000000000000000000000000000000000",
-  "cryptoPepeWrapperstartBlock": 6481925,
+  "cryptoPepeWrapper": "0xe59b419fac4b9b769c4439e7c4fde22418f11c89",
+  "cryptoPepeWrapperstartBlock": 17298486,
   "pepeBase": "0x84aC94F17622241f313511B629e5E98f489AD6E4",
   "pepeBasestartBlock": 6481925,
+  "pepeGrinder": "0xD4dd63D658f603E9a0Aa381E103e05457Cd5E609",
+  "pepeGrinderstartBlock": 6481963,
   "network": "mainnet"
 }

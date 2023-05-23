@@ -2,15 +2,8 @@ import {
   PepeBorn as PepeBornEvent,
   Transfer as TransferEvent,
   UserNamed as UserNamedEvent,
-  PepeBase as BaseContract,
   SetPepeNameCall
 } from "../../generated/PepeBase/PepeBase"
-import {
-    User,
-    Pepe,
-    Transfer,
-    Mint
-} from "../../generated/schema"
 
 import {
   getOrCreateUser,
@@ -19,10 +12,12 @@ import {
   createMint,
   createPepe,
   getPepe,
-  createPepeNamed
+  createPepeNamed,
+  increaseUnwrappedBalance,
+  decreaseUnwrappedBalance
 } from "./helpers"
-import { ADDRESS_BASE, ADDRESS_ZERO, ADDRESS_WRAP} from './constants';
-import { log } from "@graphprotocol/graph-ts";
+import {  ADDRESS_ZERO, ADDRESS_WRAP} from './constants';
+import { log, BigInt } from "@graphprotocol/graph-ts";
 export function handlePepeBorn(event: PepeBornEvent): void {
   let sender = getOrCreateUser(event.transaction.from);
     let pepe = createPepe(
@@ -33,6 +28,7 @@ export function handlePepeBorn(event: PepeBornEvent): void {
       event.block.number,
       event.block.timestamp
     );
+    increaseUnwrappedBalance(sender, BigInt.fromI32(1));
     createMint(
       event.transaction.hash,
       event.logIndex,
@@ -47,7 +43,7 @@ export function handlePepeBorn(event: PepeBornEvent): void {
 export function handleTransfer(event: TransferEvent): void {
     let txTo = event.transaction.to;
     if(txTo) {
-      if (event.params._from != ADDRESS_ZERO && txTo == event.address) {
+      if (event.params._from != ADDRESS_ZERO && txTo != ADDRESS_WRAP()) {
 
 
         let sender = getOrCreateUser(event.params._from);
@@ -55,6 +51,8 @@ export function handleTransfer(event: TransferEvent): void {
         
         if (sender != null && receiver != null) {
           updatePepeOwner(event.params._tokenId, receiver.id, event.block.number);
+          decreaseUnwrappedBalance(sender, BigInt.fromI32(1));
+          increaseUnwrappedBalance(receiver, BigInt.fromI32(1));
           createTransfer(
             event.transaction.hash,
             event.logIndex,

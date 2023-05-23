@@ -5,11 +5,9 @@ import {
   Transfer as TransferEvent,
   Unwrap as UnwrapEvent,
   Wrap as WrapEvent,
-  BatchMetadataUpdate as BatchMetadataUpdateEvent
+  BatchMetadataUpdate as BatchMetadataUpdateEvent,
+  CryptoPepeWrapper as WrapperContract
 } from "../../generated/CryptoPepeWrapper/CryptoPepeWrapper"
-import {
-  User,Pepe,PepeMetadata,Wrap,Unwrap,BatchWrap,Transfer
-} from "../../generated/schema"
 import { ADDRESS_ZERO,ADDRESS_WRAP } from './constants';
 import {
   getOrCreateUser,
@@ -23,7 +21,11 @@ import {
   setTokenuri,
   changeWrapState,
   getGlobal,
-  createBatchUnwrap
+  createBatchUnwrap,
+  decreaseUnwrappedBalance,
+  increaseUnwrappedBalance,
+  decreaseWrappedBalance,
+  increaseWrappedBalance
 } from "./helpers"
 
 
@@ -54,8 +56,11 @@ export function handleTransfer(event: TransferEvent): void {
 
       if(!found) {
         let sender = getOrCreateUser(event.params.from);
+        let receiver = getOrCreateUser(event.params.to);
         if (sender != null) {
           burnPepe(event.params.tokenId, event.block.number);
+          decreaseWrappedBalance(sender, BigInt.fromI32(1));
+          increaseWrappedBalance(receiver, BigInt.fromI32(1));
           createBurn(
             event.transaction.hash,
             event.params.tokenId,
@@ -78,6 +83,8 @@ export function handleTransfer(event: TransferEvent): void {
 
     if (sender != null && receiver != null) {
       updatePepeOwner(event.params.tokenId, receiver.id, event.block.number);
+      decreaseWrappedBalance(sender, BigInt.fromI32(1));
+      increaseWrappedBalance(receiver, BigInt.fromI32(1));
       createTransfer(
         event.transaction.hash,
         event.logIndex,
@@ -101,7 +108,8 @@ export function handleWrap(event: WrapEvent): void {
     event.block.timestamp,
   );
   changeWrapState(event.params.tokenId,true);
-  setTokenuri(event.params.tokenId);
+  decreaseUnwrappedBalance(sender, BigInt.fromI32(1));
+  increaseWrappedBalance(sender, BigInt.fromI32(1));
 }
 export function handleBatchWrap(event: BatchWrapEvent): void {
   let sender = getOrCreateUser(event.params.sender)
@@ -116,8 +124,10 @@ export function handleBatchWrap(event: BatchWrapEvent): void {
   let tokenIDs = event.params.tokenIds;
   for (var i = 0; i < tokenIDs.length; i ++) {
     changeWrapState(tokenIDs[i],true);
-    setTokenuri(tokenIDs[i]); 
-}
+   
+  }
+  decreaseUnwrappedBalance(sender, BigInt.fromI32(tokenIDs.length));
+  increaseWrappedBalance(sender, BigInt.fromI32(tokenIDs.length));
 }
 export function handleUnwrap(event: UnwrapEvent): void {
   let sender = getOrCreateUser(event.params.from)
@@ -133,6 +143,13 @@ export function handleUnwrap(event: UnwrapEvent): void {
   );
   updatePepeOwner(event.params.tokenId, receiver.id, event.block.number);
   changeWrapState(event.params.tokenId,false);
+  if(receiver.id != sender.id){
+      decreaseWrappedBalance(sender, BigInt.fromI32(1));
+      increaseUnwrappedBalance(receiver, BigInt.fromI32(1));
+  }else {
+    decreaseWrappedBalance(sender, BigInt.fromI32(1));
+    increaseUnwrappedBalance(sender, BigInt.fromI32(1));
+  }
 }
 
 export function handleBatchUnwrap(event: BatchUnwrap): void {
@@ -150,16 +167,35 @@ export function handleBatchUnwrap(event: BatchUnwrap): void {
   let tokenIDs = event.params.tokenIds;
   for (var i = 0; i < tokenIDs.length; i ++) {
     changeWrapState(tokenIDs[i],false);
-    updatePepeOwner(tokenIDs[i], receiver.id, event.block.number);
+    if(receiver.id != sender.id){
+      updatePepeOwner(tokenIDs[i], receiver.id, event.block.number);
+    }
   }
+  if(receiver.id != sender.id){
+    decreaseWrappedBalance(sender, BigInt.fromI32(tokenIDs.length));
+    increaseUnwrappedBalance(receiver, BigInt.fromI32(tokenIDs.length));
+  }else {
+    decreaseWrappedBalance(sender, BigInt.fromI32(tokenIDs.length));
+    increaseUnwrappedBalance(sender, BigInt.fromI32(tokenIDs.length));
+  }
+ 
+}
   
-} 
+
 export function handleBatchMetadataUpdate(
   event: BatchMetadataUpdateEvent
 ): void {
   let global = getGlobal();
+  let wrapContract = WrapperContract.bind(ADDRESS_WRAP());
+  let uriResponse = wrapContract.try_baseTokenURI();
+  let baseURI = ""
+  if(!uriResponse.reverted) {
+      global.baseURI = uriResponse.value;
+      baseURI= uriResponse.value;
+  }
+  global.save()
   for (var i = 1; i <= global.totalSupply; i ++) {
     let bigintI = BigInt.fromU32(i)
-    setTokenuri(bigintI); 
-}
+    setTokenuri(bigintI, baseURI); 
+  }
 }

@@ -1,11 +1,14 @@
 type Global @entity{
   id: ID!
+  baseURI: String
   totalSupply: Int!
 }
 
 type User @entity{
   id: ID! #account
   username: String
+  wrappedBalance: BigInt!
+  unwrappedBalance: BigInt!
   holdings: [Pepe!] @derivedFrom(field: "owner")
 }
 type Pepe @entity{
@@ -47,6 +50,7 @@ type Attribute @entity {
 interface Transaction {
   id: ID!
   pepe: Pepe! # address
+  sender: User!
   blockNumber: BigInt!
   timestamp: BigInt!
 }

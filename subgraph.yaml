@@ -32,12 +32,32 @@ dataSources:
           handler: handlePepeNamed
       file: ./src/mappings/pepe-base.ts
   - kind: ethereum
+    name: PepeGrinder
+    network:  mainnet
+    source:
+      address: '0xD4dd63D658f603E9a0Aa381E103e05457Cd5E609'
+      abi: PepeGrinder
+      startBlock: 6481963
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Pepe
+      abis:
+        - name: PepeGrinder
+          file: ./abis/PepeGrinder.json
+      callHandlers:
+        - function: dustPepe(uint256,address)
+          handler: handleDustPepe
+      file: ./src/mappings/pepe-grinder.ts
+  - kind: ethereum
     name: CryptoPepeWrapper
     network: mainnet
     source:
-      address: '0x0000000000000000000000000000000000000000'
+      address: '0xe59b419fac4b9b769c4439e7c4fde22418f11c89'
       abi: CryptoPepeWrapper
-      startBlock: 6481925
+      startBlock: 17298486
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

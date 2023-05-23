@@ -1,7 +1,9 @@
 {
-  "cryptoPepeWrapper": "0x661526219293E2853302e11Da6717476aD2c7ffa",
-  "cryptoPepeWrapperstartBlock": 8894603,
-  "pepeBase": "0x74021902C88CB3a5bcC8aA68E7CfC416D8175dA5",
-  "pepeBasestartBlock": 8894602,
+  "cryptoPepeWrapper": "0x150520100595f7c74a5346FF68eed5d360708B4e",
+  "cryptoPepeWrapperstartBlock": 	9044402,
+  "pepeBase": "0x25eCe12c9259d70405648CB9ed8711A9a5e26f7e",
+  "pepeGrinder": "0x0000000000000000000000000000000000000000",
+  "pepeBasestartBlock": 9044401,
+  "pepeGrinderstartBlock": 9044401,
   "network": "goerli"
 }

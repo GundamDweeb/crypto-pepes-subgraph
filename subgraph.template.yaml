@@ -32,6 +32,26 @@ dataSources:
           handler: handlePepeNamed
       file: ./src/mappings/pepe-base.ts
   - kind: ethereum
+    name: PepeGrinder
+    network:  {{network}}
+    source:
+      address: '{{pepeGrinder}}'
+      abi: PepeGrinder
+      startBlock: {{pepeGrinderstartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Pepe
+      abis:
+        - name: PepeGrinder
+          file: ./abis/PepeGrinder.json
+      callHandlers:
+        - function: dustPepe(uint256,address)
+          handler: handleDustPepe
+      file: ./src/mappings/pepe-grinder.ts
+  - kind: ethereum
     name: CryptoPepeWrapper
     network: {{network}}
     source:
