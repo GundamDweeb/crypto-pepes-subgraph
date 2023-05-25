@@ -16,7 +16,6 @@ export function handleMetadata(content: Bytes): void {
       pepeMetadata.image = image.toString();
       pepeMetadata.externalURL = externalURL.toString();
       pepeMetadata.description = description.toString();
-
     }
     pepeMetadata.save();
     if(attributes) {
@@ -45,7 +44,6 @@ export function handleMetadata(content: Bytes): void {
             }
         }
     }
-
     pepeMetadata.save();
   }
 }

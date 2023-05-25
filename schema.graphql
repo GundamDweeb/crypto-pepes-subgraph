@@ -29,7 +29,7 @@ type Pepe @entity{
 }
 enum Wrapped{
     Wrapped
-    UnWrapped
+    Unwrapped
 }
 type PepeMetadata @entity {
   id: ID! # IPFS URI

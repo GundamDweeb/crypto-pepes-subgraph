@@ -48,6 +48,10 @@ export function handleTransfer(event: TransferEvent): void {
         if(receipt.logs[i].topics[0] == Bytes.fromHexString('0xbe8e6aacbb5d99c99f1992d91d807f570d0acacabee02374369ed42710dc6698')){
           found = true
         }
+         //Checking if BatchUnwrap exists
+         if(receipt.logs[i].topics[0] == Bytes.fromHexString('0x64c221819e960bac4cb845166d469384d248ca7cbd6a5119950e69b1506c4864')){
+          found = true
+        }
         //Checking if Wrap exists
         if(receipt.logs[i].topics[0] == Bytes.fromHexString('0xb61d00fdfee32467c7d81db64c811ae60c104c346debf36a14afe84b8fce59e5')){
           found = true
@@ -108,6 +112,7 @@ export function handleWrap(event: WrapEvent): void {
     event.block.timestamp,
   );
   changeWrapState(event.params.tokenId,true);
+  setTokenuri(event.params.tokenId); 
   decreaseUnwrappedBalance(sender, BigInt.fromI32(1));
   increaseWrappedBalance(sender, BigInt.fromI32(1));
 }
@@ -124,7 +129,7 @@ export function handleBatchWrap(event: BatchWrapEvent): void {
   let tokenIDs = event.params.tokenIds;
   for (var i = 0; i < tokenIDs.length; i ++) {
     changeWrapState(tokenIDs[i],true);
-   
+    setTokenuri(tokenIDs[i]); 
   }
   decreaseUnwrappedBalance(sender, BigInt.fromI32(tokenIDs.length));
   increaseWrappedBalance(sender, BigInt.fromI32(tokenIDs.length));
@@ -188,14 +193,12 @@ export function handleBatchMetadataUpdate(
   let global = getGlobal();
   let wrapContract = WrapperContract.bind(ADDRESS_WRAP());
   let uriResponse = wrapContract.try_baseTokenURI();
-  let baseURI = ""
   if(!uriResponse.reverted) {
       global.baseURI = uriResponse.value;
-      baseURI= uriResponse.value;
   }
   global.save()
   for (var i = 1; i <= global.totalSupply; i ++) {
     let bigintI = BigInt.fromU32(i)
-    setTokenuri(bigintI, baseURI); 
+    setTokenuri(bigintI); 
   }
 }

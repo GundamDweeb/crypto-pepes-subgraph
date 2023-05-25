@@ -59,7 +59,7 @@ function createZeroPepe(): void {
   pepe.owner = ADDRESS_ZERO.toHexString();
   pepe.previousOwner = ADDRESS_ZERO.toHexString();
   pepe.tokenId = BigInt.fromI32(0);
-  pepe.isWrapped = "UnWrapped";
+  pepe.isWrapped = "Unwrapped";
   pepe.named = false;
   pepe.name = "Pepe #0";
   pepe.mintedAt =
@@ -93,7 +93,7 @@ export function createPepe(
   pepe.named = false;
   pepe.name = `Pepe #${tokenID.toString()}`;
   pepe.mintedAt = timestamp;
-  pepe.isWrapped = "UnWrapped";
+  pepe.isWrapped = "Unwrapped";
   pepe.blockNumber = blockNumber;
   pepe.save();
   increaseGlobal();
@@ -160,7 +160,7 @@ export function changeWrapState(tokenID: BigInt, isWrap: boolean): void {
     if (isWrap == true) {
       pepe.isWrapped = "Wrapped";
     } else {
-      pepe.isWrapped = "UnWrapped";
+      pepe.isWrapped = "Unwrapped";
     }
     pepe.save();
   }
@@ -335,16 +335,21 @@ export function createBurn(
   burn.save();
 }
 
-export function setTokenuri(tokenID: BigInt, baseURI: string): void {
+export function setTokenuri(tokenID: BigInt) : void{
+  let wrapContract = WrapperContract.bind(ADDRESS_WRAP());
   let pepe = getPepe(tokenID);
-  if (pepe != null) {
-    let uriIPFS = "";
-
-    pepe.uri = baseURI.concat(tokenID.toString());
-    uriIPFS = baseURI.replace("ipfs://", "").concat(tokenID.toString());
-    pepe.metadata = uriIPFS;
-
-    pepe.save();
-    PepeMetadataTemplate.create(uriIPFS);
+  if(pepe != null) {
+    if(pepe.isWrapped == "Wrapped"){
+      let uriResponse = wrapContract.try_tokenURI(tokenID);
+      let uriIPFS = "";
+      if(!uriResponse.reverted) {
+          pepe.uri = uriResponse.value;
+          uriIPFS = uriResponse.value.replace("ipfs://", "");
+          pepe.metadata = uriIPFS;
+      }
+      pepe.save()
+      PepeMetadataTemplate.create(uriIPFS);
+    }
+   
   }
 }
