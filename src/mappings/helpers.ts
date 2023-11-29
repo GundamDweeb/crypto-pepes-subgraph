@@ -61,6 +61,7 @@ function createZeroPepe(): void {
   pepe.tokenId = BigInt.fromI32(0);
   pepe.isWrapped = "Unwrapped";
   pepe.named = false;
+  pepe.isGenZero = true;
   pepe.name = "Pepe #0";
   pepe.mintedAt =
     dataSource.network() == "goerli"
@@ -89,6 +90,7 @@ export function createPepe(
   pepe.father = fatherID.toHexString();
   pepe.owner = ownerID;
   pepe.previousOwner = ADDRESS_ZERO.toHexString();
+  pepe.isGenZero = motherID == BigInt.fromI32(0) && fatherID == BigInt.fromI32(0);
   pepe.tokenId = tokenID;
   pepe.named = false;
   pepe.name = `Pepe #${tokenID.toString()}`;

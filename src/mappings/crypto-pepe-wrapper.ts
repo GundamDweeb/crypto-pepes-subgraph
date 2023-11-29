@@ -33,17 +33,16 @@ import {
 export function handleTransfer(event: TransferEvent): void {
   if (event.params.to == ADDRESS_ZERO ) {
     // UNWRAP
-
     // Iterate through all the logs in the receipt
     let receipt = event.receipt;
     if(receipt){
       let logLength = receipt.logs.length
       let found = false;
       for (let i = 0; i < logLength; i++){
-        //Checking if BatchWrap exists
-        if(receipt.logs[i].topics[0] == Bytes.fromHexString('0x8ed5d8309b0c25f09161053d417ad70cf3145b32c46b88a86cf734a8524ccdc8')){
-          found = true
-        }
+        // //Checking if BatchWrap exists
+        // if(receipt.logs[i].topics[0] == Bytes.fromHexString('0x8ed5d8309b0c25f09161053d417ad70cf3145b32c46b88a86cf734a8524ccdc8')){
+        //   found = true
+        // }
         //Checking if Unwrap exists
         if(receipt.logs[i].topics[0] == Bytes.fromHexString('0xbe8e6aacbb5d99c99f1992d91d807f570d0acacabee02374369ed42710dc6698')){
           found = true
@@ -52,10 +51,10 @@ export function handleTransfer(event: TransferEvent): void {
          if(receipt.logs[i].topics[0] == Bytes.fromHexString('0x64c221819e960bac4cb845166d469384d248ca7cbd6a5119950e69b1506c4864')){
           found = true
         }
-        //Checking if Wrap exists
-        if(receipt.logs[i].topics[0] == Bytes.fromHexString('0xb61d00fdfee32467c7d81db64c811ae60c104c346debf36a14afe84b8fce59e5')){
-          found = true
-        }
+        // //Checking if Wrap exists
+        // if(receipt.logs[i].topics[0] == Bytes.fromHexString('0xb61d00fdfee32467c7d81db64c811ae60c104c346debf36a14afe84b8fce59e5')){
+        //   found = true
+        // }
       }
 
       if(!found) {
